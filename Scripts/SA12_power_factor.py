@@ -149,7 +149,8 @@ def test_run():
 ### Correction as graph is not displayed
 ### <START>
 ###    sc_points = ['PF_TARGET', 'PF_MAX', 'PF_MIN']
-    sc_points = ['TIME', 'AC_Q_1', 'AC_P_1', 'AC_S_1', 'AC_PF_1', 'AC_IRMS_1', 'PF_TARGET', 'PF_MAX', 'PF_MIN']
+###    sc_points = ['TIME', 'AC_Q_1', 'AC_P_1', 'AC_S_1', 'AC_PF_1', 'AC_IRMS_1', 'PF_TARGET', 'PF_MAX', 'PF_MIN']
+    sc_points = ['TIME', 'AC_Q_1', 'AC_Q_2', 'AC_Q_3', 'AC_P_1', 'AC_P_2', 'AC_P_3', 'AC_S_1', 'AC_S_2', 'AC_S_3', 'AC_PF_1', 'AC_PF_2', 'AC_PF_3', 'AC_IRMS_1', 'AC_IRMS_2', 'AC_IRMS_3', 'PF_TARGET', 'PF_MAX', 'PF_MIN']
 ### <END>
 
     pf_points = {}
@@ -307,6 +308,17 @@ def test_run():
                     daq.sc['PF_TARGET'] = 1.0
                     daq.sc['PF_MAX'] = pf_upper
                     daq.sc['PF_MIN'] = pf_lower
+                    if phases != 'Single Phase':
+                        daq.sc['AC_Q_2'] = data.get('AC_Q_2')            # <- Since the graph is not displayed, it is added
+                        daq.sc['AC_Q_3'] = data.get('AC_Q_3')            # <- Since the graph is not displayed, it is added
+                        daq.sc['AC_P_2'] = data.get('AC_P_2')            # <- Since the graph is not displayed, it is added
+                        daq.sc['AC_P_3'] = data.get('AC_P_3')            # <- Since the graph is not displayed, it is added
+                        daq.sc['AC_S_2'] = data.get('AC_S_2')            # <- Since the graph is not displayed, it is added
+                        daq.sc['AC_S_3'] = data.get('AC_S_3')            # <- Since the graph is not displayed, it is added
+                        daq.sc['AC_PF_2'] = data.get('AC_P_2')           # <- Since the graph is not displayed, it is added
+                        daq.sc['AC_PF_3'] = data.get('AC_P_3')           # <- Since the graph is not displayed, it is added
+                        daq.sc['AC_IRMS_2'] = data.get('AC_IRMS_2')      # <- Since the graph is not displayed, it is added
+                        daq.sc['AC_IRMS_3'] = data.get('AC_IRMS_3')      # <- Since the graph is not displayed, it is added
                     ###if eut is not None:
                     if grid is not None:
                         if chil is not None:
@@ -402,6 +414,17 @@ def test_run():
                     daq.sc['PF_TARGET'] = pf
                     daq.sc['PF_MAX'] = pf_upper
                     daq.sc['PF_MIN'] = pf_lower
+                    if phases != 'Single Phase':
+                        daq.sc['AC_Q_2'] = data.get('AC_Q_2')            # <- Since the graph is not displayed, it is added
+                        daq.sc['AC_Q_3'] = data.get('AC_Q_3')            # <- Since the graph is not displayed, it is added
+                        daq.sc['AC_P_2'] = data.get('AC_P_2')            # <- Since the graph is not displayed, it is added
+                        daq.sc['AC_P_3'] = data.get('AC_P_3')            # <- Since the graph is not displayed, it is added
+                        daq.sc['AC_S_2'] = data.get('AC_S_2')            # <- Since the graph is not displayed, it is added
+                        daq.sc['AC_S_3'] = data.get('AC_S_3')            # <- Since the graph is not displayed, it is added
+                        daq.sc['AC_PF_2'] = data.get('AC_P_2')           # <- Since the graph is not displayed, it is added
+                        daq.sc['AC_PF_3'] = data.get('AC_P_3')           # <- Since the graph is not displayed, it is added
+                        daq.sc['AC_IRMS_2'] = data.get('AC_IRMS_2')      # <- Since the graph is not displayed, it is added
+                        daq.sc['AC_IRMS_3'] = data.get('AC_IRMS_3')      # <- Since the graph is not displayed, it is added
                     ###if eut is not None:
                     if grid is not None:
                         if chil is not None:
