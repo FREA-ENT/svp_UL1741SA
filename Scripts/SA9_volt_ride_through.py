@@ -251,7 +251,7 @@ def test_run():
             for phase_test in phase_tests:
                 if daq_rms is not None:
 ###                    daq_rms.sc['AC_IRMS_MIN'] = ''
-                    data = grid.wt3000_data_capture_read()
+                    data = grid.wt3000_data_capture_read()                 # <- Since the graph is not displayed, it is added
                     daq_rms.sc['TIME'] = time.time()                       # <- Since the graph is not displayed, it is added
                     daq_rms.sc['AC_VRMS_1'] = data.get('AC_VRMS_1')        # <- Since the graph is not displayed, it is added
                     daq_rms.sc['AC_IRMS_1'] = data.get('AC_IRMS_1')        # <- Since the graph is not displayed, it is added
@@ -288,7 +288,7 @@ def test_run():
                     if daq_rms is not None:
                         daq_rms.data_sample()
 ###                        data = daq_rms.data_capture_read()
-                        data = grid.wt3000_data_capture_read()
+                        data = grid.wt3000_data_capture_read()                      # <- Since the graph is not displayed, it is added
                         irms = data.get('AC_IRMS_1')
                         if irms is not None:
                              daq_rms.sc['TIME'] = time.time()                       # <- Since the graph is not displayed, it is added
