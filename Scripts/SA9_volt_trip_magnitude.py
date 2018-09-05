@@ -1,3 +1,12 @@
+####################################################################################################
+# This script was tuned specifically for the AIST FREA environment (Fixed in 2018)
+#     AIST:National Institute of Advanced Industrial Science and Technology 
+#     FREA:Fukushima Renewable Energy Institute
+#
+# What is the AIST FREA environment
+#   Communication with SunSpecSVP is middleware called ExCon, and ExCon is
+#   a mechanism to communicate with inverters and simulators.
+####################################################################################################
 """
 Copyright (c) 2017, Sandia National Labs and SunSpec Alliance
 All rights reserved.
