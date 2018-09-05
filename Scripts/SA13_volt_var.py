@@ -775,7 +775,8 @@ def test_run():
                                     # daq.sc['V_ACT_PU_%i' % ph_val] = v_act_pu[ph]
                                     # daq.sc['Q_ACT_PU_%i' % ph_val] = q_act_pu
                                     daq.sc['V_TARGET_%i' % ph_val] = v_target
-                                    daq.sc['Q_TARGET_%i' % ph_val] = q_target[ph]
+###                                    daq.sc['Q_TARGET_%i' % ph_val] = q_target[ph]
+                                    daq.sc['Q_TARGET_%i' % ph_val] = q_test_points[p]
                                     daq.sc['Q_MIN_%i' % ph_val] = q_min[ph]
                                     daq.sc['Q_MAX_%i' % ph_val] = q_max[ph]
                                     daq.sc['Q_MIN_ERROR_%i' % ph_val] = abs(q_target[ph] - q_min[ph])
