@@ -52,6 +52,8 @@ from svpelab import hil
 import result as rslt
 
 import script
+import time
+
 
 TRIP_WAIT_DELAY = 5
 POWER_WAIT_DELAY = 5
@@ -106,9 +108,15 @@ def test_run():
     eut = None
     chil = None
 
+### Correction as graph is not displayed
+### <START>
+    sc_points = ['TIME', 'AC_IRMS_1']
+### <END>
+
     # result params
+###        'plot.title': 'title_name',
     result_params = {
-        'plot.title': 'title_name',
+        'plot.title': ts.name,
         'plot.x.title': 'Time (secs)',
         'plot.x.points': 'TIME',
         'plot.y.points': 'AC_IRMS_1',
@@ -184,7 +192,8 @@ def test_run():
 ### <END>
 
         # initialize rms data acquisition
-        daq_rms = das.das_init(ts, 'das_rms')
+###        daq_rms = das.das_init(ts, 'das_rms')
+        daq_rms = das.das_init(ts, 'das_rms', sc_points=sc_points)
         if daq_rms is not None:
             ts.log('DAS RMS device: %s' % (daq_rms.info()))
 
@@ -233,6 +242,9 @@ def test_run():
 
             for count in range(1, n_r + 1):
                 if daq_rms is not None:
+                    data = grid.wt3000_data_capture_read()                 # <- Since the graph is not displayed, it is added
+                    daq_rms.sc['TIME'] = time.time()                       # <- Since the graph is not displayed, it is added
+                    daq_rms.sc['AC_IRMS_1'] = data.get('AC_IRMS_1')        # <- Since the graph is not displayed, it is added
                     ts.log('Starting data capture %s' % (rr))
                     daq_rms.data_capture(True)
                     ts.log('Waiting for 3 seconds to start test')
@@ -285,6 +297,10 @@ def test_run():
                 ts.log('Sampling for %s seconds' % (sample_duration))
                 ts.sleep(sample_duration)
                 if daq_rms is not None:
+                    daq_rms.data_sample()                                  # <- Since the graph is not displayed, it is added
+                    data = grid.wt3000_data_capture_read()                 # <- Since the graph is not displayed, it is added
+                    daq_rms.sc['TIME'] = time.time()                       # <- Since the graph is not displayed, it is added
+                    daq_rms.sc['AC_IRMS_1'] = data.get('AC_IRMS_1')        # <- Since the graph is not displayed, it is added
                     # Increase available input power to I_rated
                     ts.log('Sampling complete')
                     daq_rms.data_capture(False)
