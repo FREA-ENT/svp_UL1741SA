@@ -9,7 +9,7 @@
 #
 # Libray Name    : gridsim_frea_simulator
 # Libray Version : 3.0.0
-# Update Date    : 2018/07/19
+# Update Date    : 2018/09/05
 # changer        : FCS) Hasegawa
 # Used Script    : SA09 - SA15
 ###################################################################################################
@@ -773,7 +773,7 @@ class GridSim(gridsim.GridSim):
 ###        self.ts.sleep(3)
 ###        rtn = self.query(':MEAS:WT3000 :NUM:NORM:VAL? 23\n')
         #test start
-        rtn = ':MEAS:WT3000 200.222E+00'
+###        rtn = ':MEAS:WT3000 200.222E+00'
         #test end
         self.ts.log('rtn = %s' % (rtn))
         tmp = rtn.split(" ")
@@ -789,7 +789,7 @@ class GridSim(gridsim.GridSim):
         rtn = self.query(':MEAS:WT3000 :NUM:NORM:VAL? 24\n')
 ###        self.ts.sleep(3)
         #test start
-        rtn = ':MEAS:WT3000 0.848E+00'
+###        rtn = ':MEAS:WT3000 0.848E+00'
         #test end
         self.ts.log('rtn = %s' % (rtn))
         tmp = rtn.split(" ")
@@ -805,7 +805,7 @@ class GridSim(gridsim.GridSim):
         rtn = self.query(':MEAS:WT3000 :NUM:NORM:VAL? 25\n')
 ###        self.ts.sleep(3)
         #test start
-        rtn = ':MEAS:WT3000 -0.073E+03'
+###        rtn = ':MEAS:WT3000 -0.073E+03'
         #test end
         self.ts.log('rtn = %s' % (rtn))
         tmp = rtn.split(" ")
@@ -821,7 +821,7 @@ class GridSim(gridsim.GridSim):
         rtn = self.query(':MEAS:WT3000 :NUM:NORM:VAL? 26\n')
 ###        self.ts.sleep(3)
         #test start
-        rtn = ':MEAS:WT3000 -0.073E+03'
+###        rtn = ':MEAS:WT3000 -0.073E+03'
         #test end
         self.ts.log('rtn = %s' % (rtn))
         tmp = rtn.split(" ")
@@ -837,7 +837,7 @@ class GridSim(gridsim.GridSim):
         rtn = self.query(':MEAS:WT3000 :NUM:NORM:VAL? 27\n')
 ###        self.ts.sleep(3)
         #test start
-        rtn = ':MEAS:WT3000 -0.10001E+05'
+###        rtn = ':MEAS:WT3000 -0.10001E+05'
         #test end
         self.ts.log('rtn = %s' % (rtn))
         tmp = rtn.split(" ")
@@ -853,7 +853,7 @@ class GridSim(gridsim.GridSim):
         rtn = self.query(':MEAS:WT3000 :NUM:NORM:VAL? 30\n')
 ###        self.ts.sleep(3)
         #test start
-        rtn = ':MEAS:WT3000 47.500'
+###        rtn = ':MEAS:WT3000 47.500'
         #test end
         self.ts.log('rtn = %s' % (rtn))
         tmp = rtn.split(" ")
@@ -874,7 +874,7 @@ class GridSim(gridsim.GridSim):
 ###        self.ts.sleep(3)
 ###        rtn = self.query(':MEAS:WT3000 :NUM:NORM:VAL? 34\n')
         #test start
-        rtn = ':MEAS:WT3000 202.222E+00'
+###        rtn = ':MEAS:WT3000 202.222E+00'
         #test end
         self.ts.log('rtn = %s' % (rtn))
         tmp = rtn.split(" ")
@@ -890,7 +890,7 @@ class GridSim(gridsim.GridSim):
         rtn = self.query(':MEAS:WT3000 :NUM:NORM:VAL? 35\n')
 ###        self.ts.sleep(3)
         #test start
-        rtn = ':MEAS:WT3000 0.851E+00'
+###        rtn = ':MEAS:WT3000 0.851E+00'
         #test end
         self.ts.log('rtn = %s' % (rtn))
         tmp = rtn.split(" ")
@@ -906,7 +906,7 @@ class GridSim(gridsim.GridSim):
         rtn = self.query(':MEAS:WT3000 :NUM:NORM:VAL? 36\n')
 ###        self.ts.sleep(3)
         #test start
-        rtn = ':MEAS:WT3000 -0.076E+03'
+###        rtn = ':MEAS:WT3000 -0.076E+03'
         #test end
         self.ts.log('rtn = %s' % (rtn))
         tmp = rtn.split(" ")
@@ -922,7 +922,7 @@ class GridSim(gridsim.GridSim):
         rtn = self.query(':MEAS:WT3000 :NUM:NORM:VAL? 37\n')
 ###        self.ts.sleep(3)
         #test start
-        rtn = ':MEAS:WT3000 -0.073E+03'
+###        rtn = ':MEAS:WT3000 -0.073E+03'
         #test end
         self.ts.log('rtn = %s' % (rtn))
         tmp = rtn.split(" ")
@@ -938,7 +938,7 @@ class GridSim(gridsim.GridSim):
         rtn = self.query(':MEAS:WT3000 :NUM:NORM:VAL? 38\n')
 ###        self.ts.sleep(3)
         #test start
-        rtn = ':MEAS:WT3000 -0.10021E+05'
+###        rtn = ':MEAS:WT3000 -0.10021E+05'
         #test end
         self.ts.log('rtn = %s' % (rtn))
         tmp = rtn.split(" ")
@@ -954,7 +954,7 @@ class GridSim(gridsim.GridSim):
         rtn = self.query(':MEAS:WT3000 :NUM:NORM:VAL? 41\n')
 ###        self.ts.sleep(3)
         #test start
-        rtn = ':MEAS:WT3000 47.500'
+###        rtn = ':MEAS:WT3000 47.500'
         #test end
         self.ts.log('rtn = %s' % (rtn))
         tmp = rtn.split(" ")
