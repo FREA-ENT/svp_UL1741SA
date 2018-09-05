@@ -95,7 +95,11 @@ def test_run():
     result = script.RESULT_FAIL
     eut = grid = load = pv = daq_rms = daq_wf = chil = None
 
-    sc_points = ['AC_IRMS_MIN']
+### Correction as graph is not displayed
+### <START>
+###    sc_points = ['AC_IRMS_MIN']
+    sc_points = ['TIME', 'AC_VRMS_1', 'AC_IRMS_1', 'SC_TRIG', 'AC_IRMS_MIN']
+### <END>
 
     # result params
     result_params = {
@@ -196,8 +200,8 @@ def test_run():
         daq_rms = das.das_init(ts, 'das_rms', sc_points=sc_points)
         if daq_rms is not None:
             ts.log('DAS RMS device: %s' % (daq_rms.info()))
-            daq_rms.sc['SC_TRIG'] = 0
-            daq_rms.sc['AC_IRMS_MIN'] = ''
+###            daq_rms.sc['SC_TRIG'] = 0
+###            daq_rms.sc['AC_IRMS_MIN'] = ''
 
         # initialize waveform data acquisition
         daq_wf = das.das_init(ts, 'das_wf')
@@ -237,7 +241,14 @@ def test_run():
 
             for phase_test in phase_tests:
                 if daq_rms is not None:
-                    daq_rms.sc['AC_IRMS_MIN'] = ''
+###                    daq_rms.sc['AC_IRMS_MIN'] = ''
+                    data = grid.wt3000_data_capture_read()
+                    daq_rms.sc['TIME'] = time.time()                       # <- Since the graph is not displayed, it is added
+                    daq_rms.sc['AC_VRMS_1'] = data.get('AC_VRMS_1')        # <- Since the graph is not displayed, it is added
+                    daq_rms.sc['AC_IRMS_1'] = data.get('AC_IRMS_1')        # <- Since the graph is not displayed, it is added
+                    daq_rms.sc['SC_TRIG'] = ''                             # <- Since the graph is not displayed, it is added
+                    irms = data.get('AC_IRMS_1')                           # <- Since the graph is not displayed, it is added
+                    daq_rms.sc['AC_IRMS_MIN'] = round(irms * .8, 2)        # <- Since the graph is not displayed, it is added
                     ts.log('Starting RMS data capture')
                     daq_rms.data_capture(True)
                     ts.log('Waiting 5 seconds to start test')
@@ -271,6 +282,10 @@ def test_run():
                         data = grid.wt3000_data_capture_read()
                         irms = data.get('AC_IRMS_1')
                         if irms is not None:
+                             daq_rms.sc['TIME'] = time.time()                       # <- Since the graph is not displayed, it is added
+                             daq_rms.sc['AC_VRMS_1'] = data.get('AC_VRMS_1')        # <- Since the graph is not displayed, it is added
+                             daq_rms.sc['AC_IRMS_1'] = data.get('AC_IRMS_1')        # <- Since the graph is not displayed, it is added
+                             daq_rms.sc['SC_TRIG'] = ''                             # <- Since the graph is not displayed, it is added
                              daq_rms.sc['AC_IRMS_MIN'] = round(irms * .8, 2)
 
                     ts.sleep(t_hold)
@@ -334,8 +349,8 @@ def test_run():
 
         # create result workbook
         file = ts.config_name() + '.xlsx'
-###        rslt.result_workbook(file, ts.results_dir(), ts.result_dir())
-###        ts.result_file(file)
+        rslt.result_workbook(file, ts.results_dir(), ts.result_dir())
+        ts.result_file(file)
 
     return result
 
