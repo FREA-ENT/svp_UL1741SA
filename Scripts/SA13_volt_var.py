@@ -683,6 +683,23 @@ def test_run():
                                                                      power*100., i))
                             filename = '%s.csv' % (test_str)
                             test_passfail = 'Pass'
+                            data = grid.wt3000_data_capture_read()         # <- Since the graph is not displayed, it is added
+                            daq.sc['TIME'] = time.time()                   # <- Since the graph is not displayed, it is added
+                            daq.sc['AC_P_1'] = data.get('AC_P_1')          # <- Since the graph is not displayed, it is added
+                            daq.sc['AC_P_2'] = data.get('AC_P_2')          # <- Since the graph is not displayed, it is added
+                            daq.sc['AC_P_3'] = data.get('AC_P_3')          # <- Since the graph is not displayed, it is added
+                            daq.sc['Q_ACT_1'] = data.get('AC_Q_1')         # <- Since the graph is not displayed, it is added
+                            daq.sc['Q_ACT_2'] = data.get('AC_Q_2')         # <- Since the graph is not displayed, it is added
+                            daq.sc['Q_ACT_3'] = data.get('AC_Q_3')         # <- Since the graph is not displayed, it is added
+                            daq.sc['AC_Q_1'] = data.get('AC_Q_1')          # <- Since the graph is not displayed, it is added
+                            daq.sc['AC_Q_2'] = data.get('AC_Q_2')          # <- Since the graph is not displayed, it is added
+                            daq.sc['AC_Q_3'] = data.get('AC_Q_3')          # <- Since the graph is not displayed, it is added
+                            daq.sc['AC_VRMS_1'] = data.get('AC_VRMS_1')    # <- Since the graph is not displayed, it is added
+                            daq.sc['AC_VRMS_2'] = data.get('AC_VRMS_2')    # <- Since the graph is not displayed, it is added
+                            daq.sc['AC_VRMS_3'] = data.get('AC_VRMS_3')    # <- Since the graph is not displayed, it is added
+                            daq.sc['V_ACT_1'] = data.get('AC_VRMS_1')      # <- Since the graph is not displayed, it is added
+                            daq.sc['V_ACT_2'] = data.get('AC_VRMS_2')      # <- Since the graph is not displayed, it is added
+                            daq.sc['V_ACT_3'] = data.get('AC_VRMS_3')      # <- Since the graph is not displayed, it is added
                             daq.data_capture(True)
 
                             for p in range(len(v_test_points)):
