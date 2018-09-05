@@ -773,7 +773,7 @@ class GridSim(gridsim.GridSim):
 ###        self.ts.sleep(3)
 ###        rtn = self.query(':MEAS:WT3000 :NUM:NORM:VAL? 23\n')
         #test start
-###        rtn = ':MEAS:WT3000 200.222E+00'
+        rtn = ':MEAS:WT3000 200.222E+00'
         #test end
         self.ts.log('rtn = %s' % (rtn))
         tmp = rtn.split(" ")
@@ -789,7 +789,7 @@ class GridSim(gridsim.GridSim):
         rtn = self.query(':MEAS:WT3000 :NUM:NORM:VAL? 24\n')
 ###        self.ts.sleep(3)
         #test start
-###        rtn = ':MEAS:WT3000 0.848E+00'
+        rtn = ':MEAS:WT3000 0.848E+00'
         #test end
         self.ts.log('rtn = %s' % (rtn))
         tmp = rtn.split(" ")
@@ -805,7 +805,7 @@ class GridSim(gridsim.GridSim):
         rtn = self.query(':MEAS:WT3000 :NUM:NORM:VAL? 25\n')
 ###        self.ts.sleep(3)
         #test start
-###        rtn = ':MEAS:WT3000 -0.073E+03'
+        rtn = ':MEAS:WT3000 -0.073E+03'
         #test end
         self.ts.log('rtn = %s' % (rtn))
         tmp = rtn.split(" ")
@@ -821,7 +821,7 @@ class GridSim(gridsim.GridSim):
         rtn = self.query(':MEAS:WT3000 :NUM:NORM:VAL? 26\n')
 ###        self.ts.sleep(3)
         #test start
-###        rtn = ':MEAS:WT3000 -0.073E+03'
+        rtn = ':MEAS:WT3000 -0.073E+03'
         #test end
         self.ts.log('rtn = %s' % (rtn))
         tmp = rtn.split(" ")
@@ -837,7 +837,7 @@ class GridSim(gridsim.GridSim):
         rtn = self.query(':MEAS:WT3000 :NUM:NORM:VAL? 27\n')
 ###        self.ts.sleep(3)
         #test start
-###        rtn = ':MEAS:WT3000 -0.10001E+05'
+        rtn = ':MEAS:WT3000 -0.10001E+05'
         #test end
         self.ts.log('rtn = %s' % (rtn))
         tmp = rtn.split(" ")
@@ -846,6 +846,22 @@ class GridSim(gridsim.GridSim):
             rtn_up['S3_AC_Q_1'] = float(tmp[1])
             rtn_up['S3_AC_Q_2'] = float(tmp[1])
             rtn_up['S3_AC_Q_3'] = float(tmp[1])
+
+        # Frequency voltage(fu)
+        self.ts.log(':MEAS:WT3000 :NUM:NORM:VAL? 30')
+        ###rtn = self.query(':MEAS:WT3000 :NUM:VAL?\n')
+        rtn = self.query(':MEAS:WT3000 :NUM:NORM:VAL? 30\n')
+###        self.ts.sleep(3)
+        #test start
+        rtn = ':MEAS:WT3000 47.500'
+        #test end
+        self.ts.log('rtn = %s' % (rtn))
+        tmp = rtn.split(" ")
+        ###if tmp[0] == ':MEAS:WT3000':
+        if tmp[0] == ':MEAS:WT3000':
+            rtn_up['S3_AC_FREQ_1'] = float(tmp[1])
+            rtn_up['S3_AC_FREQ_2'] = float(tmp[1])
+            rtn_up['S3_AC_FREQ_3'] = float(tmp[1])
 
         ##########
         # Segment4
@@ -858,7 +874,7 @@ class GridSim(gridsim.GridSim):
 ###        self.ts.sleep(3)
 ###        rtn = self.query(':MEAS:WT3000 :NUM:NORM:VAL? 34\n')
         #test start
-###        rtn = ':MEAS:WT3000 202.222E+00'
+        rtn = ':MEAS:WT3000 202.222E+00'
         #test end
         self.ts.log('rtn = %s' % (rtn))
         tmp = rtn.split(" ")
@@ -874,7 +890,7 @@ class GridSim(gridsim.GridSim):
         rtn = self.query(':MEAS:WT3000 :NUM:NORM:VAL? 35\n')
 ###        self.ts.sleep(3)
         #test start
-###        rtn = ':MEAS:WT3000 0.851E+00'
+        rtn = ':MEAS:WT3000 0.851E+00'
         #test end
         self.ts.log('rtn = %s' % (rtn))
         tmp = rtn.split(" ")
@@ -890,7 +906,7 @@ class GridSim(gridsim.GridSim):
         rtn = self.query(':MEAS:WT3000 :NUM:NORM:VAL? 36\n')
 ###        self.ts.sleep(3)
         #test start
-###        rtn = ':MEAS:WT3000 -0.076E+03'
+        rtn = ':MEAS:WT3000 -0.076E+03'
         #test end
         self.ts.log('rtn = %s' % (rtn))
         tmp = rtn.split(" ")
@@ -906,7 +922,7 @@ class GridSim(gridsim.GridSim):
         rtn = self.query(':MEAS:WT3000 :NUM:NORM:VAL? 37\n')
 ###        self.ts.sleep(3)
         #test start
-###        rtn = ':MEAS:WT3000 -0.073E+03'
+        rtn = ':MEAS:WT3000 -0.073E+03'
         #test end
         self.ts.log('rtn = %s' % (rtn))
         tmp = rtn.split(" ")
@@ -922,7 +938,7 @@ class GridSim(gridsim.GridSim):
         rtn = self.query(':MEAS:WT3000 :NUM:NORM:VAL? 38\n')
 ###        self.ts.sleep(3)
         #test start
-###        rtn = ':MEAS:WT3000 -0.10021E+05'
+        rtn = ':MEAS:WT3000 -0.10021E+05'
         #test end
         self.ts.log('rtn = %s' % (rtn))
         tmp = rtn.split(" ")
@@ -931,6 +947,22 @@ class GridSim(gridsim.GridSim):
             rtn_up['S4_AC_Q_1'] = float(tmp[1])
             rtn_up['S4_AC_Q_2'] = float(tmp[1])
             rtn_up['S4_AC_Q_3'] = float(tmp[1])
+
+        # Frequency voltage(fu)
+        self.ts.log(':MEAS:WT3000 :NUM:NORM:VAL? 41')
+        ###rtn = self.query(':MEAS:WT3000 :NUM:VAL?\n')
+        rtn = self.query(':MEAS:WT3000 :NUM:NORM:VAL? 41\n')
+###        self.ts.sleep(3)
+        #test start
+        rtn = ':MEAS:WT3000 47.500'
+        #test end
+        self.ts.log('rtn = %s' % (rtn))
+        tmp = rtn.split(" ")
+        ###if tmp[0] == ':MEAS:WT3000':
+        if tmp[0] == ':MEAS:WT3000':
+            rtn_up['S4_AC_FREQ_1'] = float(tmp[1])
+            rtn_up['S4_AC_FREQ_2'] = float(tmp[1])
+            rtn_up['S4_AC_FREQ_3'] = float(tmp[1])
 
         #####################
         # Segment3 + Segment4
@@ -959,6 +991,11 @@ class GridSim(gridsim.GridSim):
         rtn_up['AC_Q_1'] = rtn_up['S3_AC_Q_1'] + rtn_up['S4_AC_Q_1']
         rtn_up['AC_Q_2'] = rtn_up['S3_AC_Q_2'] + rtn_up['S4_AC_Q_2']
         rtn_up['AC_Q_3'] = rtn_up['S3_AC_Q_3'] + rtn_up['S4_AC_Q_3']
+
+        # Frequency voltage(fu)
+        rtn_up['AC_FREQ_1'] = (rtn_up['S3_AC_FREQ_1'] + rtn_up['S4_AC_FREQ_1'])/2
+        rtn_up['AC_FREQ_2'] = (rtn_up['S3_AC_FREQ_2'] + rtn_up['S4_AC_FREQ_2'])/2
+        rtn_up['AC_FREQ_3'] = (rtn_up['S3_AC_FREQ_3'] + rtn_up['S4_AC_FREQ_3'])/2
 
 
         self.ts.log('--------------WT3000 command End-----------------')
