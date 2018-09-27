@@ -53,6 +53,10 @@ import math
 import result as rslt
 import numpy as np
 import time
+import subprocess
+from subprocess import PIPE
+import re
+import csv
 
 test_labels = {
     1: 'Test 1 - Most Aggressive',
@@ -128,7 +132,7 @@ def q_msa_range(v_value, v_msa, q_msa, v, q):
 ###    if v_value == None:
 ###       v_value = 0
 
-    #ts.log('v_value = %s, v_msa = %s, q_msa = %s, v = %s, q = %s' % (v_value, v_msa, q_msa, v, q))
+    ts.log('v_value = %s, v_msa = %s, q_msa = %s, v = %s, q = %s' % (v_value, v_msa, q_msa, v, q))
     q_target = v_q(v_value, v, q)    # target reactive power for the voltage measurement
     q1 = v_q(v_value - v_msa, v, q)  # reactive power target from the lower voltage limit
     q2 = v_q(v_value + v_msa, v, q)  # reactive power target from the upper voltage limit
@@ -541,6 +545,15 @@ def test_run():
                                  'Point Result 3, Var Actual 3, Var Target 3, Var Min Allowed 3, Var Max Allowed 3,'
                                  'Average Voltage (pu), Total Reactive Power (pu)\n')
 
+### Graph drawing for FREA original gnuplot
+### <START>
+        grf_dat_file = ts.results_dir() + "\SA13_volt_var.csv"
+        grf_dat_file = re.sub(r'\\', "/", grf_dat_file)
+        ts.log('grf_dat_file = %s' % (grf_dat_file))
+        grf_dat = open(grf_dat_file, mode='w')
+        writer = csv.writer(grf_dat, lineterminator='\n')
+### <END>
+
         for priority in power_priorities:
             '''
             4) If the EUT has the ability to set 'Active Power Priority' or 'Reactive Power Priority', select Priority
@@ -831,6 +844,12 @@ def test_run():
                                 ts.log('q_act = %s, q_max_over = %s' % (q_act, q_max_over))
                                 q_act_pu = sum(q_act)/q_max_over
 
+### Graph drawing for FREA original gnuplot
+### <START>
+                                grf_rec = [v_act_pu, q_act_pu]
+                                writer.writerow(grf_rec)
+### <END>
+
                                 # create result summary entry of the final measurements and pass/fail results
                                 if result_summary is not None:
                                     if phases == 'Single Phase':
@@ -846,7 +865,6 @@ def test_run():
                                                                 passfail[1], q_act[1], q_target[1], q_min[1], q_max[1],
                                                                 passfail[2], q_act[2], q_target[2], q_min[2], q_max[2],
                                                                 v_act_pu, q_act_pu))
-
                             # stop capture and save
                             daq.data_capture(False)
                             ds = daq.data_capture_dataset()
@@ -884,6 +902,8 @@ def test_run():
             11) If the EUT has the ability to set 'Active Power Priority' and 'Reactive Power Priority', select the
             other Priority, return the simulated EPS voltage to nominal, and repeat steps (5) - (10).
             '''
+
+        grf_dat.close()
 
     except script.ScriptFail, e:
         reason = str(e)
@@ -924,6 +944,44 @@ def test_run():
         rslt.result_workbook(xlsxfile, ts.results_dir(), ts.result_dir())
         ts.result_file(xlsxfile)
 
+
+
+
+
+### Graph drawing for FREA original gnuplot
+### <START>
+
+        gnuplot =  subprocess.Popen('gnuplot', shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, universal_newlines=True)
+
+        ### SA13_volt_var.png
+        graph_out = ts.results_dir() + "\SA13_volt_var.png"
+        ts.log('graph_out = %s' % (graph_out))
+        graph_cmd = "set output " + "'" + graph_out + "'\n"
+        ts.log('graph_cmd1 = %s' % (graph_cmd))
+        graph_cmd = "set output " + "'" + graph_out + "'\n"
+
+        gnuplot.stdin.write('set xlabel "Average Voltage (pu)"\n')
+        gnuplot.stdin.write('set ylabel "Total Reactive Power (pu)"\n')
+        gnuplot.stdin.write('set term png size 1000, 1000\n')
+        gnuplot.stdin.write('set grid lw 1\n')
+        gnuplot.stdin.write('set key box\n')
+        gnuplot.stdin.write(graph_cmd)
+        graph_cmd = "set datafile separator ','\n"
+        gnuplot.stdin.write(graph_cmd)
+###        graph_cmd = "plot " + "'" + grf_dat_file + "'" + " with lines ti 'VV Line', " + "'" + grf_dat_file + "' ti 'VV Point' pt 6\n"
+        graph_cmd = "plot " + "'" + grf_dat_file + "' ti 'VV Point' pt 7\n"
+        ts.log('graph_cmd1 = %s' % (graph_cmd))
+        gnuplot.stdin.write(graph_cmd)
+
+        ### Return setting
+        gnuplot.stdin.write('set terminal windows\n')
+        gnuplot.stdin.write('set output\n')
+### <END>
+
+
+
+
+
     return result
 
 def run(test_script):
@@ -959,8 +1017,8 @@ info = script.ScriptInfo(name=os.path.basename(__file__), run=run, version='1.0.
 ### Add for version control
 ### <START>
 info.param_group('aist', label='AIST Parameters', glob=True)
-info.param('aist.script_version', label='Script Version', default='3.0.0')
-info.param('aist.library_version', label='Library Version (gridsim_frea_ac_simulator)', default='3.0.0')
+info.param('aist.script_version', label='Script Version', default='4.0.0')
+info.param('aist.library_version', label='Library Version (gridsim_frea_ac_simulator)', default='4.0.0')
 ### <END>
 
 info.param_group('vv', label='Test Parameters')
