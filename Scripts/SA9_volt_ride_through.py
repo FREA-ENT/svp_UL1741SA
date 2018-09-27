@@ -51,6 +51,13 @@ import result as rslt
 from svpelab import hil
 import script
 import time
+import datetime
+
+import subprocess
+from subprocess import PIPE
+import re
+import csv
+
 
 def voltage_rt_profile(v_nom=100, v1_t=100, v2_t=100, v3_t=100, t_fall=0, t_hold=1, t_rise=0, t_dwell=5, n=5):
     """
@@ -230,6 +237,15 @@ def test_run():
         result_summary.write('Result, Test Name, Power Level, Phase, Dataset File\n')
         '''
 
+### Graph drawing for FREA original gnuplot
+### <START>
+        grf_dat_file = ts.results_dir() + "\SA9_volt_ride_through.csv"
+        grf_dat_file = re.sub(r'\\', "/", grf_dat_file)
+        ts.log('grf_dat_file = %s' % (grf_dat_file))
+        grf_dat = open(grf_dat_file, mode='w')
+        writer = csv.writer(grf_dat, lineterminator='\n')
+### <END>
+
         # perform all power levels and phase tests
         for power_level in power_levels:
             # set test power level
@@ -258,6 +274,12 @@ def test_run():
                     daq_rms.sc['SC_TRIG'] = ''                             # <- Since the graph is not displayed, it is added
                     irms = data.get('AC_IRMS_1')                           # <- Since the graph is not displayed, it is added
                     daq_rms.sc['AC_IRMS_MIN'] = round(irms * .8, 2)        # <- Since the graph is not displayed, it is added
+### Graph drawing for FREA original gnuplot
+### <START>
+                    now = datetime.datetime.now()
+                    grf_rec = [now.strftime("%Y/%m/%d %H:%M:%S"), data.get('AC_VRMS_1')]
+                    writer.writerow(grf_rec)
+### <END>
                     ts.log('Starting RMS data capture')
                     daq_rms.data_capture(True)
                     ts.log('Waiting 5 seconds to start test')
@@ -296,6 +318,12 @@ def test_run():
                              daq_rms.sc['AC_IRMS_1'] = data.get('AC_IRMS_1')        # <- Since the graph is not displayed, it is added
                              daq_rms.sc['SC_TRIG'] = ''                             # <- Since the graph is not displayed, it is added
                              daq_rms.sc['AC_IRMS_MIN'] = round(irms * .8, 2)
+### Graph drawing for FREA original gnuplot
+### <START>
+                        now = datetime.datetime.now()
+                        grf_rec = [now.strftime("%Y/%m/%d %H:%M:%S"), data.get('AC_VRMS_1')]
+                        writer.writerow(grf_rec)
+### <END>
 
                     ts.sleep(t_hold)
                     for i in range(n_r):
@@ -327,6 +355,47 @@ def test_run():
                     result_params['plot.title'] = test_name
                     ts.result_file(filename, params=result_params)
                     ts.log('Saving data capture %s' % (filename))
+
+
+
+
+
+### Graph drawing for FREA original gnuplot
+### <START>
+
+        gnuplot =  subprocess.Popen('gnuplot', shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, universal_newlines=True)
+
+        ### SA9_volt_trip_time.png
+        graph_out = ts.results_dir() + "\SA9_volt_ride_through.png"
+        ts.log('graph_out = %s' % (graph_out))
+        graph_cmd = "set output " + "'" + graph_out + "'\n"
+        ts.log('graph_cmd1 = %s' % (graph_cmd))
+        graph_cmd = "set output " + "'" + graph_out + "'\n"
+        gnuplot.stdin.write(graph_cmd)
+        gnuplot.stdin.write('set term png size 1000, 1000\n')
+
+        gnuplot.stdin.write('set ylabel "Active Power (W)"\n')
+        gnuplot.stdin.write('set xdata time\n')
+        gnuplot.stdin.write('set xlabel "Time"\n')
+        gnuplot.stdin.write('set timefmt "%Y/%m/%d %H:%M:%S"\n')
+        gnuplot.stdin.write('set grid lw 1\n')
+        gnuplot.stdin.write('set key box\n')
+
+        graph_cmd = "set datafile separator ','\n"
+        gnuplot.stdin.write(graph_cmd)
+###        graph_cmd = "plot " + "'" + grf_dat_file + "'" + " using 1:2 with lines ti 'VRT Line', " + "'" + grf_dat_file + "' using 1:2 ti 'VRT Point' pt 7\n"
+        graph_cmd = "plot " + "'" + grf_dat_file + "' using 1:2 ti 'VRT Point' pt 7\n"
+        ts.log('graph_cmd1 = %s' % (graph_cmd))
+        gnuplot.stdin.write(graph_cmd)
+
+        ### Return setting
+        gnuplot.stdin.write('set terminal windows\n')
+        gnuplot.stdin.write('set output\n')
+### <END>
+
+
+
+
 
         result = script.RESULT_COMPLETE
 

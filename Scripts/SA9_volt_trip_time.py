@@ -1,3 +1,12 @@
+####################################################################################################
+# This script was tuned specifically for the AIST FREA environment (Fixed in 2018)
+#     AIST:National Institute of Advanced Industrial Science and Technology 
+#     FREA:Fukushima Renewable Energy Institute
+#
+# What is the AIST FREA environment
+#   Communication with SunSpecSVP is middleware called ExCon, and ExCon is
+#   a mechanism to communicate with inverters and simulators.
+####################################################################################################
 """
 Copyright (c) 2017, Sandia National Labs and SunSpec Alliance
 All rights reserved.
@@ -41,10 +50,18 @@ from svpelab import hil
 from svpelab import waveform, waveform_analysis
 
 import script
-import openpyxl
 import time
+import openpyxl
+import datetime
 import numpy as np
 import matplotlib.pyplot as plt
+import result as rslt
+
+import subprocess
+from subprocess import PIPE
+import re
+import csv
+
 
 def voltage_rt_profile(v_nom=100., t_t=2., P_b=100., P_U=111.):
     """
@@ -78,6 +95,22 @@ def test_run():
 
     result = script.RESULT_FAIL
     eut = grid = load = pv = daq = chil = None
+
+### Correction as graph is not displayed
+### <START>
+    sc_points = ['TIME', 'AC_VRMS_1', 'AC_IRMS_1']
+
+    # result params
+    result_params = {
+        'plot.title': ts.name,
+        'plot.x.title': 'Time (secs)',
+        'plot.x.points': 'TIME',
+        'plot.y.points': 'AC_VRMS_1',
+        'plot.y.title': 'Voltage (V)',
+        'plot.y2.points': 'AC_IRMS_1',
+        'plot.y2.title': 'Current (A)'
+    }
+### <END>
 
     try:
 
@@ -134,6 +167,7 @@ def test_run():
 
         # grid simulator is initialized with test parameters and enabled
         grid = gridsim.gridsim_init(ts)
+        grid.power_set(p_rated)               # <- Change to control from grid
 
         # pv simulator is initialized with test parameters and enabled
 ###        pv = pvsim.pvsim_init(ts)
@@ -141,7 +175,8 @@ def test_run():
 ###        pv.power_on()
 
         # initialize data acquisition
-        daq = das.das_init(ts)
+###        daq = das.das_init(ts)
+        daq = das.das_init(ts, sc_points=sc_points)
         ts.log('DAS device: %s' % daq.info())
 
         '''
@@ -154,6 +189,15 @@ def test_run():
 ###        eut.config()
         if eut is not None:
             eut.config()
+
+### Graph drawing for FREA original gnuplot
+### <START>
+        grf_dat_file = ts.results_dir() + "\SA9_volt_trip_time.csv"
+        grf_dat_file = re.sub(r'\\', "/", grf_dat_file)
+        ts.log('grf_dat_file = %s' % (grf_dat_file))
+        grf_dat = open(grf_dat_file, mode='w')
+        writer = csv.writer(grf_dat, lineterminator='\n')
+### <END>
 
         # run data capture
         ts.log('Running capture 1')
@@ -211,7 +255,17 @@ def test_run():
 
         for phase_test in phase_tests:
             if daq is not None:
+                data = grid.wt3000_data_capture_read()                 # <- Since the graph is not displayed, it is added
+                daq.sc['TIME'] = time.time()                       # <- Since the graph is not displayed, it is added
+                daq.sc['AC_VRMS_1'] = data.get('AC_VRMS_1')        # <- Since the graph is not displayed, it is added
+                daq.sc['AC_IRMS_1'] = data.get('AC_IRMS_1')        # <- Since the graph is not displayed, it is added
                 ts.log('Starting RMS data capture')
+### Graph drawing for FREA original gnuplot
+### <START>
+                now = datetime.datetime.now()
+                grf_rec = [now.strftime("%Y/%m/%d %H:%M:%S"), data.get('AC_VRMS_1')]
+                writer.writerow(grf_rec)
+### <END>
                 daq.data_capture(True)
             v_1, v_2, v_3 = phase_test[0]
             v_1_init, v_2_init, v_3_init = phase_test[3]
@@ -254,10 +308,19 @@ def test_run():
                     # Check that the EUT is functioning
                     daq.data_sample()  # Sample before the grid voltage change
 ###                    data = daq.data_capture_read()
-                    data = grid.wt3000_data_capture_read()
+                    data = grid.wt3000_data_capture_read()                 # <- Since the graph is not displayed, it is added
                     p1 = data.get('AC_P_1')
                     p2 = data.get('AC_P_2')
                     p3 = data.get('AC_P_3')
+                    daq.sc['TIME'] = time.time()                       # <- Since the graph is not displayed, it is added
+                    daq.sc['AC_VRMS_1'] = data.get('AC_VRMS_1')        # <- Since the graph is not displayed, it is added
+                    daq.sc['AC_IRMS_1'] = data.get('AC_IRMS_1')        # <- Since the graph is not displayed, it is added
+### Graph drawing for FREA original gnuplot
+### <START>
+                    now = datetime.datetime.now()
+                    grf_rec = [now.strftime("%Y/%m/%d %H:%M:%S"), data.get('AC_VRMS_1')]
+                    writer.writerow(grf_rec)
+### <END>
                     ts.log('    EUT powers before dwell: p_1 = %s  p_2 = %s  p_3 = %s' % (p1, p2, p3))
 ###                    grid.voltage((v_nom, v_nom, v_nom))
                     grid.voltageRH(v_nom, v_nom, v_nom)
@@ -268,10 +331,19 @@ def test_run():
                                % (countdown, p1, p2, p3))
                         ts.sleep(1)
 ###                        data = daq.data_capture_read()
-                        data = grid.wt3000_data_capture_read()
+                        data = grid.wt3000_data_capture_read()                 # <- Since the graph is not displayed, it is added
                         p1 = data.get('AC_P_1')
                         p2 = data.get('AC_P_2')
                         p3 = data.get('AC_P_3')
+                        daq.sc['TIME'] = time.time()                       # <- Since the graph is not displayed, it is added
+                        daq.sc['AC_VRMS_1'] = data.get('AC_VRMS_1')        # <- Since the graph is not displayed, it is added
+                        daq.sc['AC_IRMS_1'] = data.get('AC_IRMS_1')        # <- Since the graph is not displayed, it is added
+### Graph drawing for FREA original gnuplot
+### <START>
+                        now = datetime.datetime.now()
+                        grf_rec = [now.strftime("%Y/%m/%d %H:%M:%S"), data.get('AC_VRMS_1')]
+                        writer.writerow(grf_rec)
+### <END>
                     ts.sleep(3)  # return to ~rated power
 
                     forced = True
@@ -391,6 +463,61 @@ def test_run():
 ###                result_summary.write('%s, %s, %s, %s, %s \n' %
 ###                                     (passfail, ts.config_name(), t_trip, t_trip_meas, filename))
 
+### Commenting as graph is not displayed
+### <START>
+                if daq is not None:
+                    daq.data_capture(False)
+                    ds = daq.data_capture_dataset()
+                    #test_name = '%s_rms_%s_%s' % (test_label, phase_test[2], power_level[1])
+                    test_name = '%s_rms_%s_%s' % (phase_test, phase_test, phase_test)
+                    #filename = '%s.csv' % (test_name)
+                    ds.to_csv(ts.result_file_path(filename))
+                    result_params['plot.title'] = test_name
+                    ts.result_file(filename, params=result_params)
+                    ts.log('Saving data capture %s' % (filename))
+### <END>
+
+
+
+
+
+### Graph drawing for FREA original gnuplot
+### <START>
+
+        gnuplot =  subprocess.Popen('gnuplot', shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, universal_newlines=True)
+
+        ### SA9_volt_trip_time.png
+        graph_out = ts.results_dir() + "\SA9_volt_trip_time.png"
+        ts.log('graph_out = %s' % (graph_out))
+        graph_cmd = "set output " + "'" + graph_out + "'\n"
+        ts.log('graph_cmd1 = %s' % (graph_cmd))
+        graph_cmd = "set output " + "'" + graph_out + "'\n"
+        gnuplot.stdin.write(graph_cmd)
+        gnuplot.stdin.write('set term png size 1000, 1000\n')
+
+        gnuplot.stdin.write('set ylabel "Active Power (W)"\n')
+        gnuplot.stdin.write('set xdata time"\n')
+        gnuplot.stdin.write('set xlabel "Time"\n')
+        gnuplot.stdin.write('set timefmt "%Y/%m/%d %H:%M:%S"\n')
+        gnuplot.stdin.write('set grid lw 1\n')
+        gnuplot.stdin.write('set key box\n')
+
+        graph_cmd = "set datafile separator ','\n"
+        gnuplot.stdin.write(graph_cmd)
+        graph_cmd = "plot " + "'" + grf_dat_file + "'" + " using 1:2 with lines ti 'VTT Line', " + "'" + grf_dat_file + "' using 1:2 ti 'VTT Point' pt 7\n"
+###        graph_cmd = "plot " + "'" + grf_dat_file + "' using 1:2 ti 'VTT Point' pt 7\n"
+        ts.log('graph_cmd1 = %s' % (graph_cmd))
+        gnuplot.stdin.write(graph_cmd)
+
+        ### Return setting
+        gnuplot.stdin.write('set terminal windows\n')
+        gnuplot.stdin.write('set output\n')
+### <END>
+
+
+
+
+
         result = script.RESULT_COMPLETE
 
     except script.ScriptFail, e:
@@ -410,6 +537,16 @@ def test_run():
             daq.close()
         if chil is not None:
             chil.close()
+
+### Commenting as graph is not displayed
+### <START>
+        # create result workbook
+#        xlsxfile = ts.config_name() + '.xlsx'
+#        #rslt.result_workbook(xlsxfile, ts.results_dir(), ts.result_dir())
+#        rslt.result_workbook('result_summary_filename', ts.results_dir(), ts.result_dir())
+#        ts.result_file(xlsxfile)
+### <END>
+
     return result
 
 def run(test_script):
@@ -442,8 +579,8 @@ def run(test_script):
 info = script.ScriptInfo(name=os.path.basename(__file__), run=run, version='1.0.0')
 
 info.param_group('aist', label='AIST Parameters', glob=True)
-info.param('aist.script_version', label='Script Version', default='2.0.0')
-info.param('aist.library_version', label='Library Version (gridsim_frea_ac_simulator)', default='2.1.0')
+info.param('aist.script_version', label='Script Version', default='4.0.0')
+info.param('aist.library_version', label='Library Version (gridsim_frea_ac_simulator)', default='4.0.0')
 
 info.param_group('eut', label='EUT Parameters', glob=True)
 info.param('eut.p_rated', label='P_rated', default=3000)

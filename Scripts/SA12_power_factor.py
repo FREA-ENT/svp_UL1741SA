@@ -53,6 +53,10 @@ import script
 from svpelab import result as rslt
 import numpy as np
 import time
+import subprocess
+from subprocess import PIPE
+import re
+import csv
 
 def test_pass_fail(pf_act=[], pf_target=None, pf_msa=None):
 
@@ -278,6 +282,15 @@ def test_run():
                                  'Reactive Power 1 (pu), Reactive Power 2 (pu), Reactive Power 3 (pu), '
                                  'P Target at Rated (pu), Q Target at Rated (pu) \n')
 
+### Graph drawing for FREA original gnuplot
+### <START>
+        grf_dat_file = ts.results_dir() + "\SA12_power_factor.csv"
+        grf_dat_file = re.sub(r'\\', "/", grf_dat_file)
+        ts.log('grf_dat_file = %s' % (grf_dat_file))
+        grf_dat = open(grf_dat_file, mode='w')
+        writer = csv.writer(grf_dat, lineterminator='\n')
+### <END>
+
         for pf in pf_targets:
             for power_level in power_levels:
                 '''
@@ -382,6 +395,13 @@ def test_run():
 
                     p_target_at_rated = 1.0
                     q_target_at_rated = 0.0
+
+
+### Graph drawing for FREA original gnuplot
+### <START>
+                    grf_rec = [p_act[0], q_act[0]]
+                    writer.writerow(grf_rec)
+### <END>
 
                     passfail, pf_lower, pf_upper = test_pass_fail(pf_act=pf_act, pf_target=1.0, pf_msa=pf_msa)
                     if phases == 'Single Phase':
@@ -512,6 +532,8 @@ def test_run():
         11) In the case of bi-directional inverters, repeat Steps (6) - (10) for the active power flow direction
         '''
 
+        grf_dat.close()
+
         result = script.RESULT_COMPLETE
 
     except script.ScriptFail, e:
@@ -554,6 +576,44 @@ def test_run():
         rslt.result_workbook(excelfile, ts.results_dir(), ts.result_dir())
         ts.result_file(excelfile)
 
+
+
+
+
+### Graph drawing for FREA original gnuplot
+### <START>
+
+        gnuplot =  subprocess.Popen('gnuplot', shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, universal_newlines=True)
+
+        ### SA12_power_factor.png
+        graph_out = ts.results_dir() + "\SA12_power_factor.png.png"
+        ts.log('graph_out = %s' % (graph_out))
+        graph_cmd = "set output " + "'" + graph_out + "'\n"
+        ts.log('graph_cmd1 = %s' % (graph_cmd))
+        graph_cmd = "set output " + "'" + graph_out + "'\n"
+
+        gnuplot.stdin.write('set xlabel "Active Power (pu)"\n')
+        gnuplot.stdin.write('set ylabel "Reactive Active Power (pu)"\n')
+        gnuplot.stdin.write('set term png size 1000, 1000\n')
+        gnuplot.stdin.write('set grid lw 1\n')
+        gnuplot.stdin.write('set key box\n')
+        gnuplot.stdin.write(graph_cmd)
+        graph_cmd = "set datafile separator ','\n"
+        gnuplot.stdin.write(graph_cmd)
+###        graph_cmd = "plot " + "'" + grf_dat_file + "'" + " with lines ti 'VV Line', " + "'" + grf_dat_file + "' ti 'VV Point' pt 6\n"
+        graph_cmd = "plot " + "'" + grf_dat_file + "' ti 'PF Point' pt 7\n"
+        ts.log('graph_cmd1 = %s' % (graph_cmd))
+        gnuplot.stdin.write(graph_cmd)
+
+        ### Return setting
+        gnuplot.stdin.write('set terminal windows\n')
+        gnuplot.stdin.write('set output\n')
+### <END>
+
+
+
+
+
     return result
 
 def run(test_script):
@@ -588,8 +648,8 @@ info = script.ScriptInfo(name=os.path.basename(__file__), run=run, version='1.1.
 ### Add for version control
 ### <START>
 info.param_group('aist', label='AIST Parameters', glob=True)
-info.param('aist.script_version', label='Script Version', default='3.0.0')
-info.param('aist.library_version', label='Library Version (gridsim_frea_ac_simulator)', default='3.0.0')
+info.param('aist.script_version', label='Script Version', default='4.0.0')
+info.param('aist.library_version', label='Library Version (gridsim_frea_ac_simulator)', default='4.0.0')
 ### <END>
 
 info.param_group('spf', label='Test Parameters')

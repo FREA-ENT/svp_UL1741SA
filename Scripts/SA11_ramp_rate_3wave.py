@@ -52,7 +52,13 @@ from svpelab import hil
 import result as rslt
 
 import script
+import datetime
 import time
+
+import subprocess
+from subprocess import PIPE
+import re
+import csv
 
 
 TRIP_WAIT_DELAY = 5
@@ -210,6 +216,15 @@ def test_run():
 ###            eut.config()
 ### <END>
 
+### Graph drawing for FREA original gnuplot
+### <START>
+        grf_dat_file = ts.results_dir() + "\SA11_ramp_rate_3wave.csv"
+        grf_dat_file = re.sub(r'\\', "/", grf_dat_file)
+        ts.log('grf_dat_file = %s' % (grf_dat_file))
+        grf_dat = open(grf_dat_file, mode='w')
+        writer = csv.writer(grf_dat, lineterminator='\n')
+### <END>
+
         if soft_start:
             test_label = 'ss'
         else:
@@ -246,9 +261,17 @@ def test_run():
                     daq_rms.sc['TIME'] = time.time()                       # <- Since the graph is not displayed, it is added
                     daq_rms.sc['AC_IRMS_1'] = data.get('AC_IRMS_1')        # <- Since the graph is not displayed, it is added
                     ts.log('Starting data capture %s' % (rr))
+### Graph drawing for FREA original gnuplot
+### <START>
+                    ###grf_rec = [time.time(), data.get('AC_IRMS_1')]
+                    now = datetime.datetime.now()
+                    grf_rec = [now.strftime("%Y/%m/%d %H:%M:%S"), data.get('AC_IRMS_1')]
+                    writer.writerow(grf_rec)
+### <END>
                     daq_rms.data_capture(True)
                     ts.log('Waiting for 3 seconds to start test')
-                    ts.sleep(3)
+                    #ts.sleep(3)
+                    time.sleep(3)
                 if soft_start:
                     # set soft start ramp rate
 ###                    batt.ramp_rates(params={'power': p_rated ,'ramp_rate': rr * 100})       <- Commented out because middleware is communicated using gridsim
@@ -284,7 +307,8 @@ def test_run():
 ### for test           ts.log('Nominal voltage V3= %s' % (v3))
                     grid.voltageRR(str(v_trip_grid1), str(v_trip_grid2), str(v_trip_grid3))
                     ts.log('Waiting %s seconds' % (TRIP_WAIT_DELAY))
-                    ts.sleep(TRIP_WAIT_DELAY)
+                    #ts.sleep(TRIP_WAIT_DELAY)
+                    time.sleep(TRIP_WAIT_DELAY)
                     ts.log('Setting voltage to original nominal voltage (%s V)' % v1)
 ###                    grid.voltage((v1, v2, v3))                                       <- Commented out because middleware is communicated using gridsim
                     grid.voltageRR(str(v1), str(v2), str(v3))                           # <- Change to control from grid
@@ -294,7 +318,8 @@ def test_run():
 ###                    batt.ramp_rates(params={'power': p_low ,'ramp_rate': rr * 100})  <- Commented out because middleware is communicated using gridsim
                     grid.ramp_rates(params={'power': p_low ,'ramp_rate': rr * 100})     # <- Change to control from grid
                     ts.log('Waiting for %s seconds' % (POWER_WAIT_DELAY))
-                    ts.sleep(POWER_WAIT_DELAY)
+                    #ts.sleep(POWER_WAIT_DELAY)
+                    time.sleep(POWER_WAIT_DELAY)
 
                 ts.log('Ramp rate: %s%%/sec - pass %s' % (rr, count))
                 ts.log('Setting to I_rated: %s' % (i_rated))
@@ -302,12 +327,20 @@ def test_run():
 ###                batt.ramp_rates(params={'power': p_rated ,'ramp_rate': rr * 100})    <- Commented out because middleware is communicated using gridsim
                 grid.ramp_rates(params={'power': p_rated ,'ramp_rate': rr * 100})       # <- Change to control from grid
                 ts.log('Sampling for %s seconds' % (sample_duration))
-                ts.sleep(sample_duration)
+                #ts.sleep(sample_duration)
+                time.sleep(sample_duration)
                 if daq_rms is not None:
-                    daq_rms.data_sample()                                  # <- Since the graph is not displayed, it is added
-                    data = grid.wt3000_data_capture_read()                 # <- Since the graph is not displayed, it is added
-                    daq_rms.sc['TIME'] = time.time()                       # <- Since the graph is not displayed, it is added
-                    daq_rms.sc['AC_IRMS_1'] = data.get('AC_IRMS_1')        # <- Since the graph is not displayed, it is added
+                    daq_rms.data_sample()                                               # <- Since the graph is not displayed, it is added
+                    data = grid.wt3000_data_capture_read()                              # <- Since the graph is not displayed, it is added
+                    daq_rms.sc['TIME'] = time.time()                                    # <- Since the graph is not displayed, it is added
+                    daq_rms.sc['AC_IRMS_1'] = data.get('AC_IRMS_1')                     # <- Since the graph is not displayed, it is added
+### Graph drawing for FREA original gnuplot
+### <START>
+                    ###grf_rec = [time.time(), data.get('AC_IRMS_1')]
+                    now = datetime.datetime.now()
+                    grf_rec = [now.strftime("%Y/%m/%d %H:%M:%S"), data.get('AC_IRMS_1')]
+                    writer.writerow(grf_rec)
+### <END>
                     # Increase available input power to I_rated
                     ts.log('Sampling complete')
                     daq_rms.data_capture(False)
@@ -319,6 +352,8 @@ def test_run():
                     result_params['plot.title'] = test_name
                     ts.result_file(filename, params=result_params)
                     ts.log('Saving data capture %s' % (filename))
+
+        grf_dat.close()
 
         result = script.RESULT_COMPLETE
 
@@ -354,6 +389,47 @@ def test_run():
         rslt.result_workbook(file, ts.results_dir(), ts.result_dir())
         ts.result_file(file)
 
+
+
+
+
+### Graph drawing for FREA original gnuplot
+### <START>
+
+        gnuplot =  subprocess.Popen('gnuplot', shell=True, stdin=PIPE, stdout=PIPE, stderr=PIPE, universal_newlines=True)
+
+        ### SA11_ramp_rate_3wave.png
+        graph_out = ts.results_dir() + "\SA11_ramp_rate_3wave.png"
+        ts.log('graph_out = %s' % (graph_out))
+        graph_cmd = "set output " + "'" + graph_out + "'\n"
+        ts.log('graph_cmd1 = %s' % (graph_cmd))
+        graph_cmd = "set output " + "'" + graph_out + "'\n"
+        gnuplot.stdin.write(graph_cmd)
+        gnuplot.stdin.write('set term png size 1000, 1000\n')
+
+        gnuplot.stdin.write('set ylabel "Active Power (W)"\n')
+        gnuplot.stdin.write('set xdata time"\n')
+        gnuplot.stdin.write('set xlabel "Time"\n')
+        gnuplot.stdin.write('set timefmt "%Y/%m/%d %H:%M:%S"\n')
+        gnuplot.stdin.write('set grid lw 1\n')
+        gnuplot.stdin.write('set key box\n')
+
+        graph_cmd = "set datafile separator ','\n"
+        gnuplot.stdin.write(graph_cmd)
+        graph_cmd = "plot " + "'" + grf_dat_file + "'" + " using 1:2 with lines ti 'RR Line', " + "'" + grf_dat_file + "' using 1:2 ti 'RR Point' pt 7\n"
+###        graph_cmd = "plot " + "'" + grf_dat_file + "' using 1:2 ti 'RR Point' pt 7\n"
+        ts.log('graph_cmd1 = %s' % (graph_cmd))
+        gnuplot.stdin.write(graph_cmd)
+
+        ### Return setting
+        gnuplot.stdin.write('set terminal windows\n')
+        gnuplot.stdin.write('set output\n')
+### <END>
+
+
+
+
+
     return result
 
 def run(test_script):
@@ -388,8 +464,8 @@ info = script.ScriptInfo(name=os.path.basename(__file__), run=run, version='1.0.
 ### Add for version control
 ### <START>
 info.param_group('aist', label='AIST Parameters', glob=True)
-info.param('aist.script_version', label='Script Version', default='3.0.0')
-info.param('aist.library_version', label='Library Version (gridsim_frea_ac_simulator)', default='3.0.0')
+info.param('aist.script_version', label='Script Version', default='4.0.0')
+info.param('aist.library_version', label='Library Version (gridsim_frea_ac_simulator)', default='4.0.0')
 ### <END>
 
 info.param_group('rr', label='Test Parameters')
